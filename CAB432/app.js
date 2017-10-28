@@ -17,6 +17,8 @@ const passport = require('passport');
 const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
+const request  = require("request");
+const Twit = require('twit');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -74,13 +76,52 @@ app.use((req, res, next) => {
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
+var T = new Twit({
+  consumer_key:         process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret:      process.env.TWITTER_CONSUMER_SECRET,
+  access_token:         process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET,
+  timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests. 
+ });
+
 /**
  * Primary app routes.
  */
 app.get('/', (req, res) => {
   return res.render('landing', {title: "Welcome"});
 });
+
 app.get('/home', homeController.index);
+
+var stream = T.stream('statuses/sample');
+
+var tweets = [];
+
+app.get('/tweets', (req, res) => {
+  let keywords = req.query.keywords;
+  tweets = [];
+  stream = T.stream('statuses/filter', { track: keywords });
+  console.log('Done');
+  res.render('home', {keywords: keywords});
+});
+
+stream.on('tweet', function (tweet) {
+  tweets.push(tweet.text);
+})
+
+app.get('/tweetsjson', (req, res) => {
+  res.json(tweets);
+});
+
+// app.get('/iss', (req, res) => {
+//   var url = "http://api.open-notify.org/iss-now.json";
+//   request(url, (err, response, body) => {
+//       if (!err && response.statusCode == 200){
+//          var data = JSON.parse(body);
+//          res.send(data);
+//       }
+//   });
+// });
 
 /**
  * Error Handler.

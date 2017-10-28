@@ -9,7 +9,7 @@
   "author": "Kelok Chan",
   "license": "MIT",
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "mocha --reporter spec",
     "postinstall": "npm rebuild node-sass",
     "eslint": "eslint **/*.js"
@@ -32,11 +32,13 @@
     "mongoose": "^4.11.7",
     "morgan": "^1.8.2",
     "node-sass-middleware": "^0.11.0",
+    "nodemon": "^1.12.1",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "pug": "^2.0.0-rc.3",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
+    "twit": "^2.2.9",
     "validator": "^8.0.0"
   },
   "devDependencies": {

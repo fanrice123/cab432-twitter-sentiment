@@ -1,3 +1,5 @@
+const Twit = require('twit');
+
 /**
  * GET /
  * Home page.
