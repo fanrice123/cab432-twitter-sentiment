@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .page-header.text-center
+    h3 Enter your keywords, separated by space
+  .row.text-center1
+    .col.col-md-12
+      form.form-horizontal(method='POST')
+        .form-group
+          .col-sm-10
+            input.form-control(type='text', name='name', id='name', placeholder='#Dog Cute', autofocus)
+          .col-sm-2
+            button.btn.btn-lg.btn-success.btn-block(type='submit')
+              i.fa.fa-arrow-right
+              | Submit
+        .form-group
+          .col-sm-offset-3.col-sm-7
+            
