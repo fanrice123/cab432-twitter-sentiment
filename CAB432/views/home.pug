@@ -4,14 +4,24 @@ block content
   .page-header.text-center
     h3 Enter your keywords, separated by comma
   .row.text-center
-    form.form-horizontal(action='/tweets', method='get')
-      .form-group
-        .col-md-10
-          input.form-control(type='text', name='keywords', id='keywords', placeholder='#Dog Cute', autofocus, text=keywords)
-        .col-md-2
-          button.form-control.btn.btn-success.btn-block.submit-btn(type='submit')
-            i.fa.fa-arrow-right
-            | Submit
+    form#main-form.form-horizontal(action='/tweets', method='get')
+      .col-md-8
+        input.form-control(type='text', name='keywords', id='keywords', placeholder='#Dog Cute', autofocus, text=keywords)
+      .col-md-2
+        select.form-control(name='limit', id='limit')
+          option(value=200) Select a limit
+          option(value=500) 500
+          option(value=1000) 1000
+          option(value=2000) 2000
+      .col-md-2
+        button.form-control.btn.btn-success.btn-block.submit-btn(type='submit')
+          i.fa.fa-arrow-right
+          | Submit
+
+  br 
+  .row.text-center.loading-txt
+    i.fa.fa-circle-o-notch.fa-spin(style='font-size:24px')
+    h4 Loading Tweets...
 
 
-            
+  

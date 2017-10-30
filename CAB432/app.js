@@ -17,8 +17,9 @@ const passport = require('passport');
 const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
-const request  = require("request");
+const request = require("request");
 const Twit = require('twit');
+const Twitter = require('twitter');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -44,7 +45,7 @@ const app = express();
  * Express configuration.
  */
 app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
-app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 80);
+app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(expressStatusMonitor());
@@ -77,40 +78,40 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 var T = new Twit({
-  consumer_key:         process.env.TWITTER_CONSUMER_KEY,
-  consumer_secret:      process.env.TWITTER_CONSUMER_SECRET,
-  access_token:         process.env.TWITTER_ACCESS_TOKEN,
-  access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET,
-  timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests. 
- });
+  consumer_key: process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+  access_token: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+  timeout_ms: 60 * 1000,  // optional HTTP request timeout to apply to all requests. 
+});
 
 /**
  * Primary app routes.
  */
 app.get('/', (req, res) => {
-  return res.render('landing', {title: "Welcome"});
+  return res.render('landing', { title: "Welcome" });
 });
 
 app.get('/home', homeController.index);
 
-var stream = T.stream('statuses/sample');
-
-var tweets = [];
-
 app.get('/tweets', (req, res) => {
   let keywords = req.query.keywords;
-  tweets = [];
-  stream = T.stream('statuses/filter', { track: keywords });
-  console.log('Done');
-  res.render('home', {keywords: keywords});
-});
+  let limit = req.query.limit;
+  var tweets = [];
 
-stream.on('tweet', function (tweet) {
-  tweets.push(tweet.text);
-})
+  if (keywords.length > 0)
+    stream = T.stream('statuses/filter', { track: keywords });
+  else
+    stream = T.stream('statuses/sample');
 
-app.get('/tweetsjson', (req, res) => {
-  res.json(tweets);
+  stream.on('tweet', (tweet) => {
+    tweets.unshift(tweet);
+    if (tweets.length == limit) {
+      stream.stop();
+      req.flash('success', { msg: 'Tweets retrieved' });
+      res.render('tweets', { title: 'Tweets', keywords: keywords, tweets: tweets });
+    }
+  });
 });
 
 // app.get('/iss', (req, res) => {

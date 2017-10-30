@@ -60,33 +60,6 @@ textarea {
   margin-right: 6px;
 }
 
-.card {
-  padding: 25px;
-  font-size: large;
-  background-color: #fafafa;
-  border-left: 6px solid #45ABCD;
-  margin-bottom: 10px;
-  -webkit-box-shadow: 0 5px 8px -6px rgba(0, 0, 0, .2);
-  -moz-box-shadow: 0 5px 8px -6px rgba(0, 0, 0, .2);
-  box-shadow: 0 5px 8px -6px rgba(0, 0, 0, .2);
-  transition: 0.3s;
-  &.warning {
-    border-color: $brand-warning;
-  }
-  &.success {
-    border-color: $brand-success;
-  }
-  &.danger {
-    border-color: $brand-danger;
-  }
-  &.info {
-    border-color: $brand-info;
-  }
-  &:hover {
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-  }
-}
-
 .landing {
   width: 100vw;
   height: 70vh;
@@ -104,25 +77,12 @@ textarea {
   }
 }
 
-.btn-huge {
-  margin: 10px 0 10px 0;
-  padding: 60px;
+.loading-txt {
+  display: none;
 }
 
-.result {
-  .title {
-    color: $brand-success;
-  }
-  a {
-    color: black;
-    &.btn {
-      color: white !important;
-    }
-  }
-  .information {
-    color: white;
-  }
-  .capitalize {
-    text-transform: capitalize;
-  }
+.table-overflow {
+  max-height: 700px;
+  overflow: scroll;
+  overflow-x: hidden;
 }

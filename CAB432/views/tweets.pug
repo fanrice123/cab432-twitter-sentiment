@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .page-header.text-center
+    h3 Tweets
+  div.table-overflow
+    table.table.table-hover
+      thead
+        tr
+          th Date
+          th User
+          th Tweet
+      tbody
+        each tweet in tweets
+          tr
+            td=tweet.created_at
+            td=tweet.user.screen_name
+            td=tweet.text
