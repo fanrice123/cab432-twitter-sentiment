@@ -1,0 +1,77 @@
+extends layout
+
+block content
+  .page-header 
+    h3 Text Cloud
+    #cloud.text-center
+  .page-header 
+    h3 Sentiment Chart
+    canvas#chart
+  .page-header
+    h3 Real-time Tweets
+    .table-overflow
+      table.table.table-hover.table-bordered.table-striped
+        thead
+          tr
+            th Date
+            th User
+            th Tweet
+        tbody
+          each tweet in tweets
+            tr
+              td=tweet.created_at
+              td=tweet.user.screen_name
+              td=tweet.text
+
+  script.
+    var myArray = !{wordCloudData}
+    var fillColor = d3.scale.category20();
+    var w = 800,
+        h = 400;
+
+    d3.layout.cloud().size([w, h])
+        .words(myArray.map((d) => {
+          return {text:d, size: 10 + Math.random() * 90}
+        }))
+        .padding(5)
+        .rotate(function() { return ~~(Math.random() * 2) * 90; })      
+        .font("Impact")
+        .fontSize(function(d) { return d.size; })
+        .on("end", drawCloud)
+        .start();
+
+    function drawCloud(words) {
+      d3.select("#cloud").append("svg")
+          .attr("width", w)
+          .attr("height", h)
+          .append("g")
+          .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
+          .selectAll("text")
+          .data(words)
+          .enter().append("text")
+          .style("font-size", function(d) { return (d.size) + "px"; })
+          .style("font-family", "Impact")
+          .style("fill", function(d, i) { return fillColor(i); })
+          .attr("text-anchor", "middle")
+          .attr("transform", function(d,i) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              }
+          )
+        .text(function(d) { return d.text; });
+    }
+
+    data = {
+      labels: [ 'Positive', 'Negative' ],
+      datasets: [{
+        data: !{chartData},
+        backgroundColor: [
+          '#4CAF50',   //green
+          '#F44336'   //red
+        ],
+      }],      
+    };
+    var ctx = document.getElementById('chart');
+    var myDoughnutChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: data
+    });

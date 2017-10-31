@@ -18,9 +18,6 @@ const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const request = require("request");
-const Twit = require('twit');
-const analyze = require('Sentimental').analyze;
-const fs = require("fs");
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -30,7 +27,8 @@ dotenv.load({ path: '.env' });
 /**
  * Controllers (route handlers).
  */
-const homeController = require('./controllers/home');
+const homeController = require('./controllers/homeController');
+const analysisController = require('./controllers/analysisController');
 
 /**
  * API keys and Passport configuration.
@@ -78,14 +76,6 @@ app.use((req, res, next) => {
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
-var T = new Twit({
-  consumer_key: process.env.TWITTER_CONSUMER_KEY,
-  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-  access_token: process.env.TWITTER_ACCESS_TOKEN,
-  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
-  timeout_ms: 60 * 1000,  // optional HTTP request timeout to apply to all requests. 
-});
-
 /**
  * Primary app routes.
  */
@@ -95,65 +85,13 @@ app.get('/', (req, res) => {
 
 app.get('/home', homeController.index);
 
-var tweets = [];
-
 /**
  * Endpoint for retrieving tweets used for NLP in the backend
  * Tweets limit is based on the user-selected value
  */
-app.get('/tweets', (req, res) => {
-  let keywords = req.query.keywords;
-  let limit = req.query.limit;
-  tweets = [];
+app.get('/result', analysisController.result);
 
-  if (keywords.length > 0)
-    stream = T.stream('statuses/filter', { track: keywords, language: 'en' });
-  else
-    stream = T.stream('statuses/sample', { language: 'en' });
-
-  stream.on('tweet', (tweet) => {
-    if (tweets.length < limit) {
-      tweets.push(tweet);
-      console.log('Loaded ' + tweets.length + ' of ' + limit);
-    }
-  });
-
-  // Stop the request after specified seconds
-  setTimeout(() => {
-    stream.stop();
-    req.flash('success', { msg: tweets.length + ' tweets retrieved' });
-    res.render('tweets', { title: 'Tweets', keywords: keywords, tweets: tweets });
-  }, 5 * 1000);
-});
-
-app.get('/test', (req, res) => {
-  console.log(tweets[0]);
-  let result = [];
-
-  let sample = [];
-
-  var texts = fs.readFileSync("public/data/pos.txt").toString().split("\n");
-  var texts2 = fs.readFileSync("public/data/neg.txt").toString().split("\n");
-
-  tweets.forEach(function(tweet) {
-    sample.push(tweet.text);
-  }, this);
-
-  
-  for (i in texts) {
-    sample.push(texts[i]);
-  }
-  
-  for (j in texts2) {
-    sample.push(texts2[j]);
-  }
-  
-  sample.forEach((data) => {
-    result.unshift(analyze(data));
-  }, this);
-  
-  res.json(result);  
-});
+app.get('/intervalData', analysisController.intervalData);
 
 /**
  * Error Handler.

@@ -4,24 +4,35 @@ block content
   .page-header.text-center
     h3 Enter your keywords, separated by comma
   .row.text-center
-    form#main-form.form-horizontal(action='/tweets', method='get')
+    form#main-form.form-horizontal(action='/result', method='get')
       .col-md-8
-        input.form-control(type='text', name='keywords', id='keywords', placeholder='#Dog Cute', autofocus, text=keywords)
+        input.form-control(type='text', name='keywords', id='keywords', placeholder='Donald Trump', autofocus)
       .col-md-2
         select.form-control(name='limit', id='limit', data-toggle='tooltip' title='Limit')
-          option(value=150) 150
-          option(value=250) 250
-          option(value=500) 500
-          option(value=1000) 1000
+          option(value=5000) 5000
+          option(value=10000) 10000
+          option(value=50000) 50000
+          option(value=80000) 80000
       .col-md-2
         button.form-control.btn.btn-success.btn-block.submit-btn(type='submit')
-          i.fa.fa-arrow-right
-          | Submit
+          i.fa.fa-magic
+          | Analyze
+  
+  br
+  .row.text-center
+    .col-md-12
+      sm
+        i
+          | If no keyword specified 
+          code statuses/sample
+          |  endpoint will be used
+
+        
 
   br 
   .row.text-center.loading-txt
     i.fa.fa-circle-o-notch.fa-spin(style='font-size:24px')
-    h4 Loading Tweets...
+    h4 Finding real-time tweets...
 
 
   

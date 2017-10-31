@@ -2,9 +2,8 @@ extends layout
 
 block content
   .page-header.text-center
-    h3 Tweets
-    a(href="/test") Test
-  div.table-overflow
+    h3 Real-time Tweets
+  .table-overflow
     table.table.table-hover.table-bordered.table-striped
       thead
         tr
@@ -17,3 +16,6 @@ block content
             td=tweet.created_at
             td=tweet.user.screen_name
             td=tweet.text
+  br
+  .row.text-center
+    a.btn.btn-info(href="/result?limit=" + limit + "&keywords=" + keywords) Visualize Sentiment Result

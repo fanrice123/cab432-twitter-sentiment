@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "Sentimental": "^1.0.1",
-    "bluebird": "^3.5.0",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.17.2",
     "chalk": "^2.1.0",
     "compression": "^1.7.0",
@@ -29,6 +29,7 @@
     "express-session": "^1.15.5",
     "express-status-monitor": "^1.0.0",
     "express-validator": "^3.2.1",
+    "lodash": "^4.17.4",
     "lusca": "^1.5.1",
     "moment": "^2.18.1",
     "mongoose": "^4.11.7",
@@ -42,6 +43,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "socket.io": "^2.0.4",
+    "string-search": "^1.2.0",
     "twit": "^2.2.9",
     "twitter": "^1.7.1",
     "validator": "^8.0.0"
