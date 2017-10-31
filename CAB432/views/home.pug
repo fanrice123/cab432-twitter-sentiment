@@ -8,11 +8,11 @@ block content
       .col-md-8
         input.form-control(type='text', name='keywords', id='keywords', placeholder='#Dog Cute', autofocus, text=keywords)
       .col-md-2
-        select.form-control(name='limit', id='limit')
-          option(value=200) Select a limit
+        select.form-control(name='limit', id='limit', data-toggle='tooltip' title='Limit')
+          option(value=150) 150
+          option(value=250) 250
           option(value=500) 500
           option(value=1000) 1000
-          option(value=2000) 2000
       .col-md-2
         button.form-control.btn.btn-success.btn-block.submit-btn(type='submit')
           i.fa.fa-arrow-right
