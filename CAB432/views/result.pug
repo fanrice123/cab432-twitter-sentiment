@@ -22,6 +22,11 @@ block content
               td=tweet.created_at
               td=tweet.user.screen_name
               td=tweet.text
+          else
+            tr 
+              td No real-time tweet yet, only tweet archive is analyzed
+              td
+              td
 
   script.
     var cloudData = !{ wordCloudData };
@@ -108,6 +113,7 @@ block content
 
     function refreshTable(tableId, tweets) {
       var rows = '';
+      if (tweets.length > 0) {
         $.each(tweets, function(index, tweet) {
             var row = '<tr>';
             row += '<td>' + tweet.created_at + '</td>';
@@ -116,6 +122,7 @@ block content
             rows += row + '<tr>';
         });
         $('#' + tableId + ' tbody').html(rows);
+      }
     }
 
     function updateData() {
