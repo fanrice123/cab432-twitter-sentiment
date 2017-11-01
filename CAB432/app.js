@@ -11,8 +11,6 @@ const errorHandler = require('errorhandler');
 const dotenv = require('dotenv');
 const flash = require('express-flash');
 const path = require('path');
-const mongoose = require('mongoose');
-const passport = require('passport');
 const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
@@ -28,11 +26,6 @@ dotenv.load({ path: '.env' });
  */
 const homeController = require('./controllers/homeController');
 const analysisController = require('./controllers/analysisController');
-
-/**
- * API keys and Passport configuration.
- */
-const passportConfig = require('./config/passport');
 
 /**
  * Create Express server.
