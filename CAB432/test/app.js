@@ -17,19 +17,19 @@ describe('GET /home', () => {
   });
 });
 
-describe('GET /result/name', () => {
-  it('should return 302 redirect when no details given', (done) => {
+describe('GET /result?keywords=test&limit=8000', () => {
+  it('should return 200 OK', (done) => {
     request(app)
-      .get('/result/name')
-      .expect(302, done);
+      .get('/result?keywords=test&limit=8000')
+      .expect(200, done);
   });
 });
 
-describe('GET /result/birthday', () => {
-  it('should return 302 redirect when no details given', (done) => {
+describe('GET /result', () => {
+  it('should return 500 when no params given', (done) => {
     request(app)
-      .get('/result/birthday')
-      .expect(302, done);
+      .get('/result')
+      .expect(500, done);
   });
 });
 
