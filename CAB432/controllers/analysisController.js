@@ -16,6 +16,7 @@ var T = new Twit({
 });
 
 var stream;
+var keywords = null;
 var tweets = [];
 var analysisResult = [];
 
@@ -24,7 +25,11 @@ var analysisResult = [];
  * Result page.
  */
 exports.result = (req, res) => {
-  let keywords = req.query.keywords;
+  // Stop existing stream
+  if (keywords && stream) {
+    stream.stop();
+  }
+  keywords = req.query.keywords;
   let limit = req.query.limit;
   tweets = [];
   analysisResult = [];
@@ -39,8 +44,6 @@ exports.result = (req, res) => {
     // Place the newest tweet in the first index
     tweets.unshift(tweet);
 
-    console.log(tweet);
-
     // Only store the most recent 300 tweets streamed
     if (tweets.length > 300) {
       tweets.pop();
@@ -51,19 +54,7 @@ exports.result = (req, res) => {
       addAndPop(analysisResult, analyze(tweet.text));
     }
   });
-
-
-  // Close stream when request closed unexpectedly
-  req.on('close', () => {
-    stream.stop();
-  });
   
-  // Close stream when user navigates to other page
-  req.on('end', () => {
-    stream.stop();
-  });
-
-
   // Start analyzing streamed tweets after specified seconds
   setTimeout(() => {
     tweets.forEach(function (tweet) {
