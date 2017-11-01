@@ -2,7 +2,7 @@ extends layout
 
 block content
   .page-header 
-    h3 Text Cloud
+    h3 Word Cloud
     #cloud.text-center
   .page-header 
     h3 Sentiment Chart
@@ -10,7 +10,7 @@ block content
   .page-header
     h3 Real-time Tweets
     .table-overflow
-      table.table.table-hover.table-bordered.table-striped
+      table#tweets-table.table.table-hover.table-bordered.table-striped
         thead
           tr
             th Date
@@ -24,54 +24,114 @@ block content
               td=tweet.text
 
   script.
-    var myArray = !{wordCloudData}
+    var cloudData = !{ wordCloudData };
+    var chartData = !{ chartData };
     var fillColor = d3.scale.category20();
-    var w = 800,
-        h = 400;
+    var w = 1000, h = 600;
+    var cloud = d3.layout.cloud();
+    var myChart = initChart(chartData);
 
-    d3.layout.cloud().size([w, h])
-        .words(myArray.map((d) => {
-          return {text:d, size: 10 + Math.random() * 90}
+    initCloud(cloudData);
+
+    setTimeout(updateData(), 5000);
+
+
+    function initCloud(words) {
+      cloud.size([w, h])
+        .words(words.map((d) => {
+          return { text: d, size: 20 + Math.random() * 90 }
         }))
         .padding(5)
-        .rotate(function() { return ~~(Math.random() * 2) * 90; })      
+        .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
-        .fontSize(function(d) { return d.size; })
+        .fontSize(function (d) { return d.size; })
         .on("end", drawCloud)
         .start();
-
-    function drawCloud(words) {
-      d3.select("#cloud").append("svg")
-          .attr("width", w)
-          .attr("height", h)
-          .append("g")
-          .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
-          .selectAll("text")
-          .data(words)
-          .enter().append("text")
-          .style("font-size", function(d) { return (d.size) + "px"; })
-          .style("font-family", "Impact")
-          .style("fill", function(d, i) { return fillColor(i); })
-          .attr("text-anchor", "middle")
-          .attr("transform", function(d,i) {
-                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-              }
-          )
-        .text(function(d) { return d.text; });
     }
 
-    data = {
-      labels: [ 'Positive', 'Negative' ],
-      datasets: [{
-        data: !{chartData},
-        backgroundColor: [
-          '#4CAF50',   //green
-          '#F44336'   //red
-        ],
-      }],      
-    };
-    var ctx = document.getElementById('chart');
-    var myDoughnutChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: data
-    });
+    function drawCloud(words) {
+      d3.select("svg").remove();
+      d3.select("#cloud").append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .append("g")
+        .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")
+        .selectAll("text")
+        .data(words)
+        .enter().append("text")
+        .style("font-size", function (d) { return (d.size) + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function (d, i) { return fillColor(i); })
+        .attr("text-anchor", "middle")
+        .attr("transform", function (d, i) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        }
+        )
+        .text(function (d) { return d.text; });
+    }
+
+    function initChart(chartData) {
+      data = {
+        labels: ['Positive', 'Negative'],
+        datasets: [{
+          data: !{ chartData },
+          backgroundColor: [
+            '#4CAF50',   //green
+            '#F44336'   //red
+          ],
+        }],
+      };
+      let ctx = document.getElementById('chart');
+      return new Chart(ctx, {
+        type: 'doughnut',
+        data: data
+      });
+    }
+
+    function refreshChart(newData) {
+      if (myChart != null) {
+        let prevConfig = myChart.data;
+        prevConfig.datasets[0].data = newData;
+        myChart.destroy();
+        let ctx = document.getElementById('chart');
+        return new Chart(ctx, {
+          type: 'doughnut',
+          data: prevConfig,
+          options: {
+              animation: {
+                duration: 0
+            }
+          }
+        });
+      }
+    }
+
+    function refreshTable(tableId, tweets) {
+      var rows = '';
+        $.each(tweets, function(index, tweet) {
+            var row = '<tr>';
+            row += '<td>' + tweet.created_at + '</td>';
+            row += '<td>' + tweet.user.screen_name + '</td>';
+            row += '<td>' + tweet.text + '</td>';
+            rows += row + '<tr>';
+        });
+        $('#' + tableId + ' tbody').html(rows);
+    }
+
+    function updateData() {
+      setInterval(function () {
+        $.ajax({
+          "url": '/intervalData',
+          "success": function (data) {
+            console.log(data);
+            initCloud(data.wordCloudData);
+            refreshChart(data.chartData);
+            refreshTable('tweets-table', data.tweets);
+            tweets = data.tweets;
+          },
+          "error": function (error) {
+          }
+        })
+      }, 5 * 1000);
+    }
+    

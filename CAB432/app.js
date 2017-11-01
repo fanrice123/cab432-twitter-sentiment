@@ -9,7 +9,6 @@ const logger = require('morgan');
 const chalk = require('chalk');
 const errorHandler = require('errorhandler');
 const dotenv = require('dotenv');
-const MongoStore = require('connect-mongo')(session);
 const flash = require('express-flash');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -61,11 +60,6 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: process.env.SESSION_SECRET
-  // store: new MongoStore({
-  //   url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
-  //   autoReconnect: true,
-  //   clear_interval: 3600
-  // })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -87,7 +81,6 @@ app.get('/home', homeController.index);
 
 /**
  * Endpoint for retrieving tweets used for NLP in the backend
- * Tweets limit is based on the user-selected value
  */
 app.get('/result', analysisController.result);
 
