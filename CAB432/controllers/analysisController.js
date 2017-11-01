@@ -39,6 +39,8 @@ exports.result = (req, res) => {
     // Place the newest tweet in the first index
     tweets.unshift(tweet);
 
+    console.log(tweet);
+
     // Only store the most recent 300 tweets streamed
     if (tweets.length > 300) {
       tweets.pop();
@@ -51,19 +53,29 @@ exports.result = (req, res) => {
   });
 
 
+  // Close stream when request closed unexpectedly
+  req.on('close', () => {
+    stream.stop();
+  });
+  
+  // Close stream when user navigates to other page
+  req.on('end', () => {
+    stream.stop();
+  });
+
+
   // Start analyzing streamed tweets after specified seconds
   setTimeout(() => {
     tweets.forEach(function (tweet) {
       analysisResult.unshift(analyze(tweet.text));
     }, this);
 
-    // Load the remaining tweets locally
     let remaining = limit - analysisResult.length;
 
     readLocalTweets('public/data/sample_tweets.txt')
       .then(data => {
         let unfilteredSample = data.toString().split('\n');
-        filterLocalTweets(keywords, unfilteredSample)
+        filterLocalTweets(keywords, unfilteredSample, analysisResult.length, limit)
           .then(filteredSample => {
             for (i in filteredSample) {
               analysisResult.push(analyze(filteredSample[i]));
@@ -82,13 +94,12 @@ exports.result = (req, res) => {
       .catch(error => {
         console.log('Error: ', error);
       });
-  }, 7 * 1000);
+  }, 5 * 1000);
 };
 
 /**
  * Endpoint for receiving updated data
  * Called after intial result is shown
- * Used to refresh the UI data
  */
 exports.intervalData = (req, res) => {
   let chartData = createSentimentChartDatset(analysisResult);
