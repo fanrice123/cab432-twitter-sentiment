@@ -54,6 +54,11 @@ exports.result = (req, res) => {
       addAndPop(analysisResult, analyze(tweet.text));
     }
   });
+
+  // Stop the stream during unexpected request failure
+  req.on('close', () => {
+    stream.stop();
+  });
   
   // Start analyzing streamed tweets after specified seconds
   setTimeout(() => {
